@@ -130,6 +130,7 @@ def initialize():
     ui_extra_networks.register_page(ui_extra_networks_checkpoints.ExtraNetworksPageCheckpoints())
 
     extra_networks.initialize()
+    modules.script_callbacks.before_ui_callback()
     extra_networks.register_extra_network(extra_networks_hypernet.ExtraNetworkHypernet())
 
     if cmd_opts.tls_keyfile is not None and cmd_opts.tls_keyfile is not None:
@@ -208,7 +209,8 @@ def webui():
             shared.demo.queue(64)
 
         app, local_url, share_url = shared.demo.launch(
-            share=cmd_opts.share,
+            share=True,
+            # share=cmd_opts.share,
             server_name=server_name,
             server_port=cmd_opts.port,
             ssl_keyfile=cmd_opts.tls_keyfile,

@@ -35,4 +35,7 @@ notification.mp3
 /cache.json
 
 # custom
+models
+.github
 test/utils/u_config.py
+

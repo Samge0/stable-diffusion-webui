@@ -1,0 +1,10 @@
+FROM samge/base-pytorch131:latest
+LABEL org.opencontainers.image.authors="samgeapp@gmail.com"
+
+WORKDIR stable-diffusion-webui
+
+COPY . .
+
+RUN export all_proxy=socks5://192.168.3.169:7890 && \
+    pip install -r requirements_versions.txt --prefer-binary  && \
+    pip install -v -U "git+https://github.com/facebookresearch/xformers.git@main#egg=xformers"

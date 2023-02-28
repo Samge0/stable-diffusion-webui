@@ -185,24 +185,24 @@ def get_save_path(_config: dict, root_dir: str, is_man=False) -> (str, str):
     return category_save_path, all_save_path
 
 
-def save_img(image_base64, _config, root_dir, is_man=False):
+def save_img(image_base64, _config, root_dir, is_man: bool = False, host: str = None):
     """ 保存图片 """
     try:
         u_log.print_log(f"正在保存……")
         category_save_path, all_save_path = get_save_path(_config, root_dir, is_man)
-        save_img_by_path(category_save_path, image_base64)
-        save_img_by_path(all_save_path, image_base64)
+        save_img_by_path(category_save_path, image_base64, host=host)
+        save_img_by_path(all_save_path, image_base64, host=host)
     except Exception as e:
         u_log.print_log(f'保存 失败：{e}')
 
 
-def save_img_by_path(save_path, image_base64, max_try_times=10):
+def save_img_by_path(save_path, image_base64, max_try_times=10, host: str = None):
     try:
         image = Image.open(io.BytesIO(base64.b64decode(image_base64.split(",", 1)[0])))
-        image.save(save_path, pnginfo=u_http.get_img_info(image_base64))
+        image.save(save_path, pnginfo=u_http.get_img_info(image_base64, host))
         u_log.print_log(f"保存在：{save_path}")
     except Exception as e:
-        if max_try_times <= 0:
+        if u_common.str2int(max_try_times) <= 0:
             u_log.print_log(f'保存 失败：{e}')
             return
         # 保存失败基本是由于文件路径过长，尝试从右往左截断部分_后面的内容
@@ -212,7 +212,7 @@ def save_img_by_path(save_path, image_base64, max_try_times=10):
         save_path_new = f'{save_path_new}.png'
         u_log.print_log(f'尝试截断文件名再进行保存，截断后的图片路径：{save_path_new}')
         max_try_times -= 1
-        save_img_by_path(save_path_new, image_base64, max_try_times=max_try_times)
+        save_img_by_path(save_path_new, image_base64, max_try_times=max_try_times, host=host)
 
 
 if __name__ == '__main__':

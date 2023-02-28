@@ -22,13 +22,13 @@ def get_save_dir() -> str:
     return u_file.join(u_file.get_parent_path(current_path, 3), '/outputs/txt2img-images/api-test')
 
 
-def get_img_info(i):
+def get_img_info(i, host: str = None):
     """ 获取图片配置信息 """
     try:
         png_payload = {
             "image": "data:image/png;base64," + i
         }
-        response2 = requests.post(url=u_config.api_imginfo, json=png_payload)
+        response2 = requests.post(url=u_config.get_api_imginfo(host), json=png_payload)
         imginfo = PngImagePlugin.PngInfo()
         imginfo.add_text("parameters", response2.json().get("info"))
         return imginfo
@@ -37,27 +37,28 @@ def get_img_info(i):
         return None
 
 
-def test_txt2img(count: int, is_man=False):
+def test_txt2img(count: int, is_man: bool = False, host: str = None):
     """
     文字转图片
     Args:
         count: 当前执行次数
         is_man: 是否男
+        host: 自定义服务器地址
     Returns:
     """
     tag = 'man' if is_man else 'women'
     _config = u_prompt_man.get_config() if is_man else u_prompt.get_config()
-    u_log.print_log(f"\n【{count}-{tag}-{u_config.api_base_url}】正在执行（steps={_config.get('steps')}，batch_size={_config.get('batch_size')}），请稍后……")
+    u_log.print_log(f"\n【{count}-{tag}-{host or u_config.api_base_url}】正在执行（steps={_config.get('steps')}，batch_size={_config.get('batch_size')}），请稍后……")
     payload = generate_payload_t2i(_config)
     try:
-        response = requests.post(url=u_config.api_txt2img, json=payload)
+        response = requests.post(url=u_config.get_api_txt2img(host), json=payload)
         if response.status_code != 200:
             u_log.print_log(f"执行失败：status_code = {response.status_code}")
             time.sleep(5)
             return
         r = eval(response.text)
         for image_base64 in r.get('images') or []:
-            u_file.save_img(image_base64, _config, get_save_dir(), is_man=True)
+            u_file.save_img(image_base64, _config, get_save_dir(), is_man=is_man, host=host)
             time.sleep(1)  # 避免重名
         u_log.print_log('执行完成')
     except Exception as e:

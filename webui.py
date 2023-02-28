@@ -217,8 +217,8 @@ def webui():
                     gradio_auth_creds += [x.strip() for x in line.split(',')]
 
         app, local_url, share_url = shared.demo.launch(
-            share=True,
-            # share=cmd_opts.share,
+            # share=True,
+            share=cmd_opts.share,
             server_name=server_name,
             server_port=cmd_opts.port,
             ssl_keyfile=cmd_opts.tls_keyfile,

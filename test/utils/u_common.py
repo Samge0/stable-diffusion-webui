@@ -4,7 +4,7 @@
 # @Author  : Samge
 
 
-def str2int(v: str) -> int:
+def str2int(v: str | int) -> int:
     return int(v or 0)
 
 
